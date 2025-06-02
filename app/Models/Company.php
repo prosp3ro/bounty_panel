@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\CompanyPlanEnum;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $uuid
@@ -50,5 +54,44 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Company extends Model
 {
-    //
+    /** @use HasFactory<\Database\Factories\CompanyFactory> */
+    use HasFactory;
+    use SoftDeletes;
+
+    protected $table = "companies";
+
+    protected $fillable = [
+        "slug",
+        "company_name",
+        "logo_path",
+        "website_url",
+        "contact_url",
+        "business_email",
+        "country",
+        "address",
+        "phone_number",
+        "about",
+        "auto_join_enabled",
+        "plan"
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            "plan" => CompanyPlanEnum::class
+        ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(related: User::class, table: "company_user");
+    }
 }
